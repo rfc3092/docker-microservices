@@ -46,7 +46,9 @@ public class BringCache {
     }
 
     public Postnummer getOne(String postnummer) {
-        return cache.get(postnummer);
+        Postnummer poststed = cache.get(postnummer);
+        LOG.log(Level.INFO, "Looked up " + postnummer +" -> " + poststed);
+        return poststed;
     }
 
     public Collection<Postnummer> getAll() {

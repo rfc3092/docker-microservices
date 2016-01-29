@@ -2,14 +2,12 @@ package no.conduct.poc.postnummer;
 
 import no.conduct.poc.postnummer.domain.BringCache;
 import no.conduct.poc.postnummer.domain.Postnummer;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.util.Collection;
 
+@CrossOrigin(origins = "*")
 @RestController
 public class PostnummerController {
 

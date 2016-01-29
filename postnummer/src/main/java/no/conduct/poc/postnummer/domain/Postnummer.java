@@ -18,4 +18,9 @@ public class Postnummer {
         return poststed;
     }
 
+    @Override
+    public String toString() {
+        return poststed;
+    }
+
 }
