@@ -4,10 +4,12 @@ public class Postnummer {
 
     private String postnummer;
     private String poststed;
+    private Kommune kommune;
 
-    protected Postnummer(String postnummer, String poststed) {
+    protected Postnummer(String postnummer, String poststed, Kommune kommune) {
         this.postnummer = postnummer;
         this.poststed = poststed;
+        this.kommune = kommune;
     }
 
     public String getPostnummer() {
@@ -16,6 +18,10 @@ public class Postnummer {
 
     public String getPoststed() {
         return poststed;
+    }
+
+    public Kommune getKommune() {
+        return kommune;
     }
 
     @Override

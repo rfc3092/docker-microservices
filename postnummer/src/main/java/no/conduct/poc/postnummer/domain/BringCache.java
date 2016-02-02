@@ -40,7 +40,7 @@ public class BringCache {
 
         Map<String, Postnummer> parsed = new HashMap<>(1);
         String[] parts = line.split("\t");
-        parsed.put(parts[0], new Postnummer(parts[0], parts[1]));
+        parsed.put(parts[0], new Postnummer(parts[0], parts[1], new Kommune(parts[2], parts[3])));
         return parsed;
 
     }
