@@ -1,6 +1,6 @@
 package no.conduct.poc.weather.domain;
 
-import no.conduct.poc.weather.WeatherUnmarshaller;
+import no.conduct.poc.weather.ForecastUnmarshaller;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
@@ -20,51 +20,52 @@ import java.util.logging.Logger;
 public class YrCache {
 
     private static final Logger LOG = Logger.getLogger(YrCache.class.getName());
-    private static final String BASE_URL = "http://symbol.yr.no/grafikk/sym/b30/%s.png";
+    private static final String VARSEL_URL = "http://www.yr.no/sted/Norge/postnummer/%s/varsel.xml";
+    private static final String IMAGE_URL = "http://symbol.yr.no/grafikk/sym/b30/%s.png";
 
     @Inject
-    private WeatherUnmarshaller unmarshaller;
+    private ForecastUnmarshaller unmarshaller;
 
-    private Map<String, String> cache = new HashMap<>();
+    private Map<String, YrCacheEntry> cache = new HashMap<>();
 
-    public String getBase64EncodedImage(String url) {
+    public YrCacheEntry getForecast(String postnummer) {
 
-        String image = cache.get(url);
-        if (image == null) {
+        YrCacheEntry entry = cache.get(postnummer);
+        if (entry == null) {
             synchronized (YrCache.class) {
-                image = cache.get(url);
-                if (image == null) {
-                    image = base64EncodeImage(getImageFromUrl(url));
-                    if (image != null) {
-                        cache.put(url, image);
+                entry = cache.get(postnummer);
+                if (entry == null) {
+                    entry = createEntryFrom(postnummer);
+                    if (entry != null) {
+                        cache.put(postnummer, entry);
                     }
                 }
             }
         }
-        return image;
+        return entry;
 
     }
 
-    private byte[] getImageFromUrl(String url) {
+    private YrCacheEntry createEntryFrom(String postnummer) {
 
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        YrCacheEntry entry = null;
+        String imageURL = null;
         try {
-            url = String.format(BASE_URL, unmarshaller.getCurrentWeatherIcon(new URL(url).openStream()));
-            try (InputStream in = new URL(url).openStream()) {
+            unmarshaller.unmarshal(new URL(String.format(VARSEL_URL, postnummer)).openStream());
+            imageURL = String.format(IMAGE_URL, unmarshaller.getIcon());
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            try (InputStream in = new URL(imageURL).openStream()) {
                 int i;
                 while ((i = in.read()) != -1) {
                     buffer.write(i);
                 }
             }
+            entry = new YrCacheEntry(Base64.getEncoder().encodeToString(buffer.toByteArray()), unmarshaller.getLink());
         } catch (IOException e) {
-            LOG.log(Level.SEVERE, "Cannot get image from URL " + url, e);
+            LOG.log(Level.SEVERE, "Cannot get image from URL " + imageURL, e);
         }
-        return buffer.toByteArray();
+        return entry;
 
-    }
-
-    private String base64EncodeImage(byte[] bytes) {
-        return Base64.getEncoder().encodeToString(bytes);
     }
 
 }

@@ -5,14 +5,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 @Configuration
-public class WeatherConfiguration {
+public class ForecastConfiguration {
 
     @Bean
-    public WeatherUnmarshaller getVarselUnmarshaller() {
+    public ForecastUnmarshaller getUnmarshaller() {
 
         Jaxb2Marshaller unmarshaller = new Jaxb2Marshaller();
         unmarshaller.setPackagesToScan("no.conduct.poc.weather.domain");
-        return new WeatherUnmarshaller(unmarshaller);
+        return new ForecastUnmarshaller(unmarshaller);
 
     }
 

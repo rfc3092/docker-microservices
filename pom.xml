@@ -18,7 +18,7 @@
     <modules>
         <module>postnummer</module>
         <module>forecast</module>
-        <module>wikipedia</module>
+        <module>wikimedia</module>
     </modules>
 
     <properties>

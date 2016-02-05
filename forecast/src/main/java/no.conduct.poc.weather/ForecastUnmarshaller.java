@@ -7,20 +7,31 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class WeatherUnmarshaller {
+public class ForecastUnmarshaller {
 
     private Unmarshaller unmarshaller;
+    private String icon;
+    private String link;
 
-    protected WeatherUnmarshaller(Unmarshaller unmarshaller) {
+    protected ForecastUnmarshaller(Unmarshaller unmarshaller) {
         this.unmarshaller = unmarshaller;
     }
 
-    public String getCurrentWeatherIcon(InputStream in)
+    public void unmarshal(InputStream in)
         throws IOException {
 
         Weatherdata weatherdata = (Weatherdata) unmarshaller.unmarshal(new StreamSource(in));
-        return weatherdata.getForecast().getTabular().getTime().getSymbol().getVar();
+        icon = weatherdata.getForecast().getTabular().getTime().getSymbol().getVar();
+        link = weatherdata.getCredit().getLink().getUrl();
 
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public String getLink() {
+        return link;
     }
 
 }

@@ -3,8 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <title>PoC</title>
+    <script src="http://maps.googleapis.com/maps/api/js"></script>
+    <script type="text/javascript">
+        function ok() {
+
+            var
+                    postnummer,
+                    services,
+                    postnummerRequest, postnummerJson,
+                    forecastRequest, forecastJson,
+                    wikidataRequest, wikidataJson, a, li;
+
+            postnummer = document.getElementById("postnummer").value;
+
+            services = {
+                postnummer: "http://localhost:8081/postnummer/",
+                forecast: "http://localhost:8083/weather/",
+                wikidata: "http://localhost:8082/wiki/"
+            };
+
+            postnummerRequest = new XMLHttpRequest();
+            postnummerRequest.onreadystatechange = function() {
+                if (postnummerRequest.readyState == 4 && postnummerRequest.status == 200) {
+                    postnummerJson = JSON.parse(postnummerRequest.responseText);
+                    if (postnummerJson.hasOwnProperty("poststed")) {
+                        document.getElementById("poststed").value = postnummerJson.poststed;
+                    }
+                }
+            };
+            postnummerRequest.open("GET", services.postnummer + postnummer);
+
+            forecastRequest = new XMLHttpRequest();
+            forecastRequest.onreadystatechange = function() {
+              if (forecastRequest.readyState == 4 && forecastRequest.status == 200) {
+                  forecastJson = JSON.parse(forecastRequest.responseText);
+                  if (forecastJson.hasOwnProperty("image")) {
+                      document.getElementById("forecast.image").setAttribute("src", "data:image/png;base64," + forecastJson.image);
+                  }
+                  if (forecastJson.hasOwnProperty("link")) {
+                      document.getElementById("forecast.link").setAttribute("href", forecastJson.link);
+                  }
+              }
+            };
+            forecastRequest.open("GET", services.forecast + postnummer);
+
+            wikidataRequest = new XMLHttpRequest();
+            wikidataRequest.onreadystatechange = function() {
+                if (wikidataRequest.readyState == 4 && wikidataRequest.status == 200) {
+                    wikidataJson = JSON.parse(wikidataRequest.responseText);
+                    wikidataJson.forEach(function(entry) {
+                        console.log(entry);
+                        a = document.createElement("a");
+                        a.setAttribute("href", entry.url);
+                        a.innerText = entry.description;
+                        li = document.createElement("li");
+                        li.appendChild(a);
+                        document.getElementById("wikidata.list").appendChild(li);
+                    });
+                    document.getElementById("wikidata.div").removeAttribute("hidden");
+                }
+            };
+            wikidataRequest.open("GET", services.wikidata + postnummer);
+
+            postnummerRequest.send();
+            forecastRequest.send();
+            wikidataRequest.send();
+
+        }
+    </script>
+    <style>
+        img {
+            position: relative;
+            top: 11px;
+        }
+    </style>
 </head>
 <body>
-    <
+    <div>
+        <label for="postnummer">Postnummer:</label>
+        <input id="postnummer" type="text" size="4" autofocus required onkeydown="if (event.keyCode == 13) { document.getElementById('ok').click(); }"/>
+        <button id="ok" onclick="ok();">OK</button>
+    </div>
+
+    <div>
+        <input id="poststed" type="text" readonly/>
+        <a id="forecast.link" href=""><img id="forecast.image" src="//:0" height="30" width="30"/></a>
+    </div>
+
+    <div id="wikidata.div" hidden>
+        <p>Treff i Wikidata:</p>
+        <ol id="wikidata.list"></ol>
+    </div>
+
 </body>
 </html>
